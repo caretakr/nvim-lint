@@ -21,13 +21,16 @@ return {
     for _, result in ipairs(decoded and decoded.Results or {}) do
       if result.Target == fpath then
         for _, misconfig in ipairs(result.Misconfigurations) do
+          local startLine = misconfig.CauseMetadata and misconfig.CauseMetadata.StartLine or 1
+          local endLine = misconfig.CauseMetadata and misconfig.CauseMetadata.EndLine or 1
+
           local err = {
             source = "trivy",
             message = string.format("%s %s", misconfig.Title, misconfig.Description),
-            col = misconfig.CauseMetadata.StartLine,
-            end_col = misconfig.CauseMetadata.EndLine,
-            lnum = misconfig.CauseMetadata.StartLine - 1,
-            end_lnum = misconfig.CauseMetadata.EndLine - 1,
+            col = startLine,
+            end_col = endLine,
+            lnum = startLine - 1,
+            end_lnum = endLine - 1,
             code = misconfig.ID,
             severity = severity_map[misconfig.Severity],
           }
